@@ -305,7 +305,8 @@ void showOptions()
              }
 
 
-    case 13: //ROLLBACK
+    case 13: rollBackHandler();
+             break; 
 
     case 14: toExit = true;
              cout << "Now exiting and saving. Thank you for using the Database Manager!" << endl;
