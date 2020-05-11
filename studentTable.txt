@@ -1,0 +1,5 @@
+Mike|1000|50|3|Marketing|Sophomore|Business
+Kate|900|70|3.7|Advertising|Freshman|Business
+John|1030|50|3.3|Statistics|Junior|Math
+Sarah|1020|70|3.7|Advertising|Freshman|Business
+Miley|1080|70|3.7|Advertising|Freshman|Business

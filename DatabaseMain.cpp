@@ -10,30 +10,141 @@ int fid = 0;
 
 void initializeDatabase()
 {
-  cout << endl;
-  cout << "Welcome to the Database Manager!" << endl;
   masterStudent = new GenBST<Student*>;
-  Student *s1 = new Student(1000, 50, 3.0, "Mike", "Marketing", "Sophomore", "Business");
-  Student *s2 = new Student(1030, 50, 3.3, "John", "Statistics", "Junior", "Math");
-  Student *s3 = new Student(1020, 70, 3.7, "Sarah", "Advertising", "Freshman", "Business");
-  Student *s4 = new Student(1080, 70, 3.7, "Miley", "Advertising", "Freshman", "Business");
-  Student *s5 = new Student(900, 70, 3.7, "Kate", "Advertising", "Freshman", "Business");
-
-  masterStudent -> insert(s1);
-  masterStudent -> insert(s2);
-  masterStudent -> insert(s3);
-  masterStudent -> insert(s4);
-  masterStudent -> insert(s5);
-
   masterFaculty = new GenBST<Faculty*>;
-  Faculty *f1 = new Faculty(50, "Professor 1", "Lecturer", "Business");
-  f1 -> advisees -> insertBack(s1);
-  f1 -> advisees -> insertBack(s2);
-  f1 -> advisees -> insertBack(s3);
 
-  Faculty *f2 = new Faculty(70, "Professor 2", "Dean", "Math");
-  masterFaculty -> insert(f1);
-  masterFaculty -> insert(f2);
+  //checking if both files are present.
+  ifstream inFSStudent;
+  ifstream inFSFaculty;
+  string stringHolder;
+
+  //masterStudent = new GenBST<Student*>;
+  //masterFaculty = new GenBST<Faculty*>;
+
+  inFSStudent.open("studentTable.txt");
+  inFSFaculty.open("facultyTable.txt");
+  if(!inFSStudent.is_open() || !inFSFaculty.is_open())
+  {
+    cout << endl;
+    cout << "could not open one or more files. Generating empty database." << endl;
+    cout << "Please make sure to add a faculty member first before adding any students or running any commands!" << endl;
+    return;
+  }
+
+  //handles student input
+  while (!inFSStudent.eof())
+  {
+    getline(inFSStudent, stringHolder);
+    if (!inFSStudent.fail())
+    {
+      size_t startPos = 0;
+      size_t endPos = 0;
+
+      string name;
+      string id;
+      string fid;
+      string gpa;
+      string field;
+      string level;
+      string major;
+
+      endPos = stringHolder.find('|');
+      name = stringHolder.substr(startPos, endPos - startPos);
+      startPos = endPos + 1;
+
+      endPos = stringHolder.find('|', endPos + 1);
+      id = stringHolder.substr(startPos, endPos - startPos);
+      startPos = endPos + 1;
+
+      endPos = stringHolder.find('|', endPos + 1);
+      fid = stringHolder.substr(startPos, endPos - startPos);
+      startPos = endPos + 1;
+
+      endPos = stringHolder.find('|', endPos + 1);
+      gpa = stringHolder.substr(startPos, endPos - startPos);
+      startPos = endPos + 1;
+
+      endPos = stringHolder.find('|', endPos + 1);
+      field = stringHolder.substr(startPos, endPos - startPos);
+      startPos = endPos + 1;
+
+      endPos = stringHolder.find('|', endPos + 1);
+      level = stringHolder.substr(startPos, endPos - startPos);
+      startPos = endPos + 1;
+
+      major = stringHolder.substr(startPos);
+
+      Student *student = new Student(stoi(id), stoi(fid), stod(gpa), name, field, level, major);
+      masterStudent -> insert(student);
+      cout << "added student!" << endl;
+    }
+  }
+
+  inFSStudent.close();
+  stringHolder.clear();
+
+
+  //handles faculty input
+  while(!inFSFaculty.eof())
+  {
+    getline(inFSFaculty, stringHolder);
+    if(!inFSFaculty.fail())
+    {
+      size_t startPos = 0;
+      size_t endPos = 0;
+
+      string name;
+      string id;
+      string level;
+      string department;
+      string advisees;
+
+      endPos = stringHolder.find('|');
+      name = stringHolder.substr(startPos, endPos - startPos);
+      startPos = endPos + 1;
+
+      endPos = stringHolder.find('|', endPos + 1);
+      id = stringHolder.substr(startPos, endPos - startPos);
+      startPos = endPos + 1;
+
+      endPos = stringHolder.find('|', endPos + 1);
+      level = stringHolder.substr(startPos, endPos - startPos);
+      startPos = endPos + 1;
+
+      endPos = stringHolder.find('|', endPos + 1);
+      department = stringHolder.substr(startPos, endPos - startPos);
+      startPos = endPos + 1;
+
+      cout << "adding faculty member" << endl;
+      Faculty *faculty = new Faculty(stoi(id), name, level, department);
+
+      if (stringHolder[startPos] != '|')
+      {
+        string heldID = "NULL";
+        heldID.clear();
+        endPos = stringHolder.find('|', endPos + 1);
+        advisees = stringHolder.substr(startPos, endPos - startPos); //grabs all ints, gotta split em.
+        for (int i = 0; i < advisees.length() -1; ++i)
+        {
+          if (advisees[i] != ' ')
+          {
+            heldID += advisees[i];
+          } else {
+            faculty -> advisees -> insertBack(masterStudent -> getNode(stoi(heldID)) -> value);
+            heldID.clear();
+          }
+        }
+        faculty -> advisees -> insertBack(masterStudent -> getNode(stoi(heldID)) -> value);
+      } else {
+        cout << "faculty member has no advisees" << endl;
+      }
+
+      masterFaculty -> insert(faculty);
+
+    }
+  }
+  inFSFaculty.close();
+
 }
 
 void showOptions()
@@ -305,8 +416,8 @@ void showOptions()
              }
 
 
-    case 13: rollBackHandler();
-             break; 
+    case 13: //rollback();
+             break;
 
     case 14: toExit = true;
              cout << "Now exiting and saving. Thank you for using the Database Manager!" << endl;
@@ -318,6 +429,22 @@ void showOptions()
 }
 
 
+
+void saveAndQuit()
+{
+  ofstream outFS;
+  //overwrites tables with a blank file to copy nodes into.
+  outFS.open("studentTable.txt");
+  outFS.close();
+  outFS.open("facultyTable.txt");
+  outFS.close();
+
+  masterStudent -> saveTree(masterStudent -> root);
+  masterFaculty -> saveTree(masterFaculty -> root);
+
+}
+
+
 int main(int argc, char **argv)
 {
   initializeDatabase();
@@ -326,5 +453,5 @@ int main(int argc, char **argv)
   {
     showOptions();
   }
-  //saveAndQuit();
+  saveAndQuit();
 }

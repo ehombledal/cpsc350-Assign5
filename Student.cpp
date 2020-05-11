@@ -33,3 +33,11 @@ void Student::printInfo()
   cout << "Major       : " << m_major << endl;
   cout << endl;
 }
+
+void Student::addToFile()
+{
+  ofstream outFS;
+  outFS.open("studentTable.txt", ios::app);
+  outFS << m_name << "|" << m_ID << "|" << m_advisorID << "|" << m_gpa << "|" << m_field << "|" << m_level << "|" << m_major << endl;
+  outFS.close();
+}

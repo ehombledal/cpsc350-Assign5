@@ -1,5 +1,6 @@
 #include <string>
 #include <iostream>
+#include <fstream>
 using namespace std;
 
 class Student
@@ -31,6 +32,7 @@ public:
   }
 
   void printInfo();
+  void addToFile();
 
   int m_ID;
   int m_advisorID;

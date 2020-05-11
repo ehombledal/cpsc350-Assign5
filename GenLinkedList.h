@@ -62,9 +62,10 @@ class GenLinkedList //Doubly linked list
     unsigned int getSize();
     bool isEmpty();
 
-  private:
     GenListNode<T> *front;
     GenListNode<T> *back;
+
+  private:
     unsigned int size;
 
 };

@@ -61,6 +61,7 @@ public:
 
   GenTreeNode<T>* getSuccessor(GenTreeNode<T> *d);
   void printTree(GenTreeNode<T> *node);
+  void saveTree(GenTreeNode<T> *node);
 
   GenTreeNode<T> *root;
 
@@ -93,6 +94,21 @@ void GenBST<T>::printTree(GenTreeNode<T> *node)
   node -> value -> printInfo();
   printTree(node->right);
 }
+
+template <typename T>
+void GenBST<T>::saveTree(GenTreeNode<T> *node)
+{
+  if (node == NULL)
+  {
+    return;
+  }
+
+  node -> value -> addToFile();
+  saveTree(node->left);
+  saveTree(node->right);
+}
+
+
 
 template <typename T>
 GenTreeNode<T>* GenBST<T>::getMax()
@@ -140,10 +156,8 @@ template <typename T>
 void GenBST<T>::insert(T value)
 {
   GenTreeNode<T> *node = new GenTreeNode<T>(value);
-  //cout << "made node" << endl;
   if (root == NULL)
   {
-    //cout << "node made as root" << endl;
     //we have an empty tree, so put the node as the root.
     root = node;
   } else {

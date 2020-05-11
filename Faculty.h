@@ -1,7 +1,5 @@
-#include <string>
 #include "GenLinkedList.h"
 #include "Student.h"
-using namespace std;
 
 class Faculty
 {
@@ -30,6 +28,8 @@ public:
   }
 
   void printInfo();
+  void addToFile();
+
 
   int m_ID;
   string m_name;

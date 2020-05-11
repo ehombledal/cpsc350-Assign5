@@ -1,0 +1,2 @@
+John Smith|50|Lecturer|Business|1000 1030 |
+Jane Doe|70|Dean|Math|900 1020 1080 |
