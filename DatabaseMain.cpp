@@ -1,14 +1,16 @@
 
 #include "GenBST.h"
 #include "Faculty.h"
+#include <cstdio>
 
 bool toExit = false;
 GenBST<Student*> *masterStudent;
 GenBST<Faculty*> *masterFaculty;
+int rollbackNumber = 1;
 int sid = 0;
 int fid = 0;
 
-void initializeDatabase()
+void initializeDatabase(string studentFile, string facultyFile)
 {
   masterStudent = new GenBST<Student*>;
   masterFaculty = new GenBST<Faculty*>;
@@ -21,13 +23,13 @@ void initializeDatabase()
   //masterStudent = new GenBST<Student*>;
   //masterFaculty = new GenBST<Faculty*>;
 
-  inFSStudent.open("studentTable.txt");
-  inFSFaculty.open("facultyTable.txt");
+  inFSStudent.open(studentFile);
+  inFSFaculty.open(facultyFile);
   if(!inFSStudent.is_open() || !inFSFaculty.is_open())
   {
     cout << endl;
     cout << "could not open one or more files. Generating empty database." << endl;
-    cout << "Please make sure to add a faculty member first before adding any students or running any commands!" << endl;
+    cout << "Please make sure to add a faculty member first, followed by a student, before running any other commands!" << endl;
     return;
   }
 
@@ -147,6 +149,32 @@ void initializeDatabase()
 
 }
 
+void rollback()
+{
+  if (rollbackNumber != 1)
+  {
+    string savedSFile = "studentBackup" + to_string(rollbackNumber-1) + ".txt";
+    string savedFFile = "facultyBackup" + to_string(rollbackNumber-1) + ".txt";
+
+    initializeDatabase(savedSFile, savedFFile);
+    remove(savedSFile.c_str());
+    remove(savedFFile.c_str());
+    rollbackNumber--;
+  } else {
+    cout << "nothing to rollback! Please make some changes and try again." << endl;
+  }
+}
+
+void handleRollback()
+{
+  string sFileName = "studentBackup" + to_string(rollbackNumber) + ".txt";
+  string fFileName = "facultyBackup" + to_string(rollbackNumber) + ".txt";
+
+  masterStudent -> saveTree(masterStudent -> root, sFileName);
+  masterFaculty -> saveTree(masterFaculty -> root, fFileName);
+  rollbackNumber++;
+}
+
 void showOptions()
 {
   cout << endl;
@@ -228,7 +256,8 @@ void showOptions()
             }
             break;
 
-    case 7:{cout << "What is the students name?" << endl;
+    case 7:{handleRollback();
+            cout << "What is the students name?" << endl;
             string sName = "NULL";
             cin >> sName;
 
@@ -272,7 +301,8 @@ void showOptions()
             cout << "student successfully created." << endl;
             break;}
 
-    case 8: cout << "What is the id of the student to be deleted?" << endl;
+    case 8: handleRollback();
+            cout << "What is the id of the student to be deleted?" << endl;
             cin >> sid;
             if (masterStudent -> searchNode(sid))
             {
@@ -285,7 +315,8 @@ void showOptions()
             }
             break;
 
-    case 9:{cout << "what is the faculty member's name?" << endl;
+    case 9:{handleRollback();
+            cout << "what is the faculty member's name?" << endl;
             string fName = "NULL";
             cin >> fName;
 
@@ -329,7 +360,8 @@ void showOptions()
             cout << "faculty member successfully added." << endl;
             break;}
 
-    case 10: cout << "What is the ID of the faculty to be deleted?" << endl;
+    case 10: handleRollback();
+             cout << "What is the ID of the faculty to be deleted?" << endl;
              cin >> fid;
              if (masterFaculty -> searchNode(fid))
              {
@@ -353,7 +385,8 @@ void showOptions()
              }
              break;
 
-    case 11: cout << "what is the ID of the student who is having their advisor changed?" << endl;
+    case 11: handleRollback();
+             cout << "what is the ID of the student who is having their advisor changed?" << endl;
              cin >> sid;
              if (masterStudent -> searchNode(sid))
              {
@@ -377,7 +410,8 @@ void showOptions()
              }
              break;
 
-    case 12: {cout << "What is the ID of the faculty member being edited?" << endl;
+    case 12: {handleRollback();
+              cout << "What is the ID of the faculty member being edited?" << endl;
              cin >> fid;
              if (masterFaculty -> searchNode(fid))
              {
@@ -416,7 +450,7 @@ void showOptions()
              }
 
 
-    case 13: //rollback();
+    case 13: rollback();
              break;
 
     case 14: toExit = true;
@@ -428,8 +462,6 @@ void showOptions()
   }
 }
 
-
-
 void saveAndQuit()
 {
   ofstream outFS;
@@ -439,15 +471,14 @@ void saveAndQuit()
   outFS.open("facultyTable.txt");
   outFS.close();
 
-  masterStudent -> saveTree(masterStudent -> root);
-  masterFaculty -> saveTree(masterFaculty -> root);
+  masterStudent -> saveTree(masterStudent -> root, "studentTable.txt");
+  masterFaculty -> saveTree(masterFaculty -> root, "facultyTable.txt");
 
 }
 
-
 int main(int argc, char **argv)
 {
-  initializeDatabase();
+  initializeDatabase("studentTable.txt", "facultyTable.txt");
 
   while (toExit == false)
   {

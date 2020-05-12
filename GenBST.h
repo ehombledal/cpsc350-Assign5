@@ -61,7 +61,7 @@ public:
 
   GenTreeNode<T>* getSuccessor(GenTreeNode<T> *d);
   void printTree(GenTreeNode<T> *node);
-  void saveTree(GenTreeNode<T> *node);
+  void saveTree(GenTreeNode<T> *node, string fileName);
 
   GenTreeNode<T> *root;
 
@@ -96,16 +96,16 @@ void GenBST<T>::printTree(GenTreeNode<T> *node)
 }
 
 template <typename T>
-void GenBST<T>::saveTree(GenTreeNode<T> *node)
+void GenBST<T>::saveTree(GenTreeNode<T> *node, string fileName)
 {
   if (node == NULL)
   {
     return;
   }
 
-  node -> value -> addToFile();
-  saveTree(node->left);
-  saveTree(node->right);
+  node -> value -> addToFile(fileName);
+  saveTree(node->left, fileName);
+  saveTree(node->right, fileName);
 }
 
 

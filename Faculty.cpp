@@ -33,10 +33,10 @@ void Faculty::printInfo()
   cout << endl;
 }
 
-void Faculty::addToFile()
+void Faculty::addToFile(string fileName)
 {
   ofstream outFS;
-  outFS.open("facultyTable.txt", ios::app);
+  outFS.open(fileName, ios::app);
   outFS << m_name << "|" << m_ID << "|" << m_level << "|" << m_department << "|";
 
   GenListNode<Student*> *current = advisees -> front;

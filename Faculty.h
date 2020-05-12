@@ -28,7 +28,7 @@ public:
   }
 
   void printInfo();
-  void addToFile();
+  void addToFile(string fileName);
 
 
   int m_ID;
